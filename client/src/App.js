@@ -3,20 +3,24 @@ import io from 'socket.io-client';
 import { useEffect, useRef, useState } from 'react';
 
 function App() {
-    const [join, setJoin] = useState(false)
     const [name, setName] = useState('')
     const [id, setId] = useState('')
     const socket = useRef()
     const [input, setInput] = useState();
     const [checkName, setCheckName] = useState(false);
 
+    // var elLongin = document.getElementById("login");
+    // var elBox = document.getElementById("box");
+
     // const [message, setMessage] = useState([])
 
     useEffect(() => {
-        socket.current = io('http://192.168.2.11:5000', {})
+        socket.current = io('http://192.168.1.7:5000', {})
         // Xử lý sự kiện khi kết nối thành công
         socket.current.on('connect', () => {
             console.log('Connected to server');
+            document.getElementById("login").style.display = "flex";
+            document.getElementById("box").style.display = "none";
         });
         socket.current.on('return_id_connect', (id) => {
             console.log('Your id is: ' + id);
@@ -25,12 +29,17 @@ function App() {
         
         socket.current.on('return_login_fail', () => {
             alert("Username đã được sử dụng!");
-            document.getElementById('login').style.visibility = "";
-            document.getElementById('box').style.visibility = "hidden";
+            // document.getElementById("login").style.visibility = "";
+            // document.getElementById("box").style.visibility = "hidden";
+            // elLongin.show();
+            // elBox.hide();
         });
        
         socket.current.on('server_return_error', data => {
             alert(data);
+            setInput("");
+            let input = document.getElementById("input-content");
+            input.focus();
         })
         // Xử lý sự kiện khi ngắt kết nối
         socket.current.on('disconnect', () => {
@@ -44,22 +53,44 @@ function App() {
             // socket.current.on('server-message', (data) => {
             //     console.log('Received message from server:', data);
             // });
+            // socket.current.on('login_success', (uid) => { 
+            //     console.log("uid:", uid)
+            //     if(uid === id) {
+            //         document.getElementById("login").style.display = "none";
+            //         document.getElementById("box").style.display = "flex";
+            //     } else {
+            //         document.getElementById("login").style.display = "flex";
+            //         document.getElementById("box").style.display = "none";
+            //     }
+            // });
 
             socket.current.on('return_users', (data) => { 
-                // setJoin(true)
-                document.getElementById('login').style.visibility = "hidden";
-                document.getElementById('box').style.visibility = "";
-                console.log("users:", data)
-                // console.log("join:", join)
-                // if(join) {
-                    let el = document.getElementById("currentUser");
-                    el.innerHTML = `Hello ${data}`;  
+                if(data) {
+                    document.getElementById("login").style.display = "none";
+                    document.getElementById("box").style.display = "flex";
+                    // elLongin.style.display = "hidden";
+                    // elBox.style.display = "visible";
+                    console.log("users:", data)
+                    
+                    // console.log("join:", join)
+                    // if(join) {
+                    let el = document.getElementById('currentUser');
+                    el.innerHTML = "";
+                    el.innerHTML = `Hello ${data}`; 
+                } else {
+                    document.getElementById("login").style.display = "flex";
+                    document.getElementById("box").style.display = "none";
+                }
                 // } 
             });
 
             socket.current.on('server_send_list_users', (data) => {
-                document.getElementById('login').style.visibilit = "hidden";
-                document.getElementById('box').style.visibility = "";
+                // // setJoin(true)
+                // document.getElementById("login").style.display = "none";
+                // document.getElementById("box").style.display = "flex";
+                // elLongin.style.visibility = "hidden";
+                // elBox.style.visibility = "visible";
+                // if(join) {
                 let el = document.getElementById('boxOnline');
                 console.log(data)
                 el.innerHTML = "";
@@ -68,6 +99,7 @@ function App() {
                         <p></p>
                     </li>`
                 });
+                // }
             })
 
             // // máy khác join
@@ -88,8 +120,10 @@ function App() {
                 socket.current.on('server_send_msg', (data) => {
                     let el = document.getElementById('userMsg');
                     console.log(data)
-                    console.log(id)
-                    // el.innerHTML += `<span class="${data.id === id ? "own" : "msg"}"> ${data.un + ": " + data.msg} </span>`;
+                    console.log(id);
+                    setInput("")
+                    let input = document.getElementById("input-content");
+                    input.focus();
 
                     el.innerHTML += `<div class="wrap_msg ${data.id === id ? "user" : ""}"/>
                         <img class="image" src="https://cdn-icons-png.flaticon.com/512/219/219988.png"
@@ -97,7 +131,7 @@ function App() {
                         <div class="wrap_msg_a">
                             <span>${data.un}</span>
                             <span class="${data.id === id ? "own" : "msg"}">
-                                Tổng: ${data.msg} 
+                                ${data.msg} 
                             </span>
                         </div>
                     </div>`;
@@ -167,10 +201,8 @@ function App() {
                             Xác nhận
                         </button>
                     </div>
-                {/* ) : ( */}
-                    <div className='app_wrapper_box' id='box' style={{
-                        visibility: "hidden"
-                    }}>
+                {/*  ) : ( */}
+                    <div className='app_wrapper_box' id='box'>
                         <div className='app_wrapper_box_status'>
                             <span className='app_wrapper_box_status_title'>
                                 Users
@@ -193,6 +225,7 @@ function App() {
                                         className='app_wrapper_box_chat_body_action_input'
                                         type='text' 
                                         value={input}
+                                        id='input-content'
                                         // min="1" max="10"
                                         onChange={onChangeNumber} 
                                         placeholder='Nhập số từ 1 - 10'

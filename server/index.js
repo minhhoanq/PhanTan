@@ -37,7 +37,7 @@ const options = {
 
 io.on('connection', (socket) => {
     console.log('A user connected. Socket ID:', socket.id);
-    const id = socket.id
+    const id = socket.id;
     // user[`${id}`] = {
 
     // }
@@ -86,6 +86,7 @@ io.on('connection', (socket) => {
             users.push(data);
             socket.Username = data;
             console.log("user:", users);
+            socket.emit('login_success', id);
             socket.emit('return_users', data);
             io.sockets.emit("server_send_list_users", users);
         }
@@ -108,7 +109,7 @@ io.on('connection', (socket) => {
         const c = pattern.test(data);  // returns a boolean
         if(c) {
             if(data < 1 || data > 10) {
-                io.sockets.emit("server_return_error", `${data} không hợp lệ!`);
+                socket.emit("server_return_error", `${data} không hợp lệ!`);
             } else {
                 io.sockets.emit("server_send_msg", {un: socket.Username,id: socket.id, msg: data, date: socket.Date});
                 sum += parseInt(data);
@@ -120,7 +121,7 @@ io.on('connection', (socket) => {
                 })
             }
         } else {
-            io.sockets.emit("server_return_error", `${data} không hợp lệ!`);
+            socket.emit("server_return_error", `${data} không hợp lệ!`);
         }
     })
 });
