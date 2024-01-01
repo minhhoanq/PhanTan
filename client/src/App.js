@@ -82,6 +82,7 @@ function App() {
                         <span class="${data.id === id ? "own" : "msg"}">
                             ${data.msg} 
                         </span>
+                        <span>${data.date}</span>
                     </div>
                 </div>`;
             })
@@ -96,6 +97,7 @@ function App() {
                         <span class='msg'>
                             Tổng: ${data.msg} 
                         </span>
+                        <span>${data.date}</span>
                     </div>
                 </div>`;
             })
