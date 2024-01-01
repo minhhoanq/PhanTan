@@ -38,45 +38,14 @@ const options = {
 io.on('connection', (socket) => {
     console.log('A user connected. Socket ID:', socket.id);
     const id = socket.id;
-    // user[`${id}`] = {
-
-    // }
     socket.emit('return_id_connect', socket.id)
     socket.on('disconnect', () => {
         console.log('user disconnected');
-        // io.emit('another-left', user[`${id}`].name)
-        // delete user[`${id}`];
         users.splice(
             users.indexOf(socket.Username), 1
         );
         console.log(users)
         socket.broadcast.emit('server_send_list_users', users)
-
-        // if(user == {}){
-        //     sum = 0
-        // }
-    });
-
-    socket.on('client-message', (message) => {
-        console.log('Received message from client:', message);
-        io.emit('server-message', `Server received: ${message}`);
-    });
-
-
-    //receiver number
-    socket.on('client-send-number', (message) => {
-        console.log('number: ', message)
-        sum += parseInt(message)
-        io.emit('message-from-another', {
-            // name: user[`${id}`].name,
-            id: socket.id,
-            message: message
-        })
-        io.emit('server-sum', {
-            name: 'Server',
-            id: 'xxx',
-            message: 'Tổng : '+ sum
-        });
     });
 
     socket.on('login', data => {
